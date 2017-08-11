@@ -11,6 +11,7 @@ import org.knowm.xchange.poloniex.dto.account.PoloniexBalance;
 import org.knowm.xchange.poloniex.dto.account.PoloniexLoan;
 import org.knowm.xchange.poloniex.dto.trade.PoloniexDepositsWithdrawalsResponse;
 import org.knowm.xchange.utils.DateUtils;
+import si.mazi.rescu.ParamsDigest;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -36,9 +37,13 @@ public class PoloniexAccountServiceRaw extends PoloniexBaseService {
   }
 
   public List<Balance> getExchangeWallet() throws IOException {
+    return getExchangeWallet(this.apiKey, this.signatureCreator);
+  }
+
+  public List<Balance> getExchangeWallet(String apiKey, ParamsDigest signatureCreator) throws IOException {
     try {
       HashMap<String, PoloniexBalance> response = poloniexAuthenticated.returnCompleteBalances(apiKey, signatureCreator, exchange.getNonceFactory(),
-          null);
+              null);
       return PoloniexAdapters.adaptPoloniexBalances(response);
     } catch (PoloniexException e) {
       throw new ExchangeException(e.getError(), e);

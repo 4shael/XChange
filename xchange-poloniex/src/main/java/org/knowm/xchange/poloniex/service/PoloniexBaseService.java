@@ -22,7 +22,7 @@ public class PoloniexBaseService extends BaseExchangeService implements BaseServ
 
   protected final String apiKey;
   protected final PoloniexAuthenticated poloniexAuthenticated;
-  protected final ParamsDigest signatureCreator;
+  protected ParamsDigest signatureCreator;
 
   protected final Poloniex poloniex;
 
