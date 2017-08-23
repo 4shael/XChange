@@ -2,6 +2,7 @@ package org.knowm.xchange.poloniex.service;
 
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.currency.Currency;
+import org.knowm.xchange.dto.UserSettings;
 import org.knowm.xchange.dto.account.AccountInfo;
 import org.knowm.xchange.dto.account.Balance;
 import org.knowm.xchange.dto.account.FundingRecord;
@@ -42,8 +43,13 @@ public class PoloniexAccountService extends PoloniexAccountServiceRaw implements
 
   @Override
   public AccountInfo getAccountInfo() throws IOException {
-
     List<Balance> balances = getExchangeWallet();
+    return new AccountInfo(new Wallet(balances));
+  }
+
+  @Override
+  public AccountInfo getAccountInfo(UserSettings userSettings) throws IOException {
+    List<Balance> balances = getExchangeWallet(userSettings.getApiKey(), getSignatureCreator(userSettings));
     return new AccountInfo(new Wallet(balances));
   }
 

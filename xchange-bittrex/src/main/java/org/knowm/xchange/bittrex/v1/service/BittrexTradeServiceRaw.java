@@ -15,6 +15,7 @@ import org.knowm.xchange.dto.trade.MarketOrder;
 import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.service.trade.params.orders.OpenOrdersParamCurrencyPair;
 import org.knowm.xchange.service.trade.params.orders.OpenOrdersParams;
+import si.mazi.rescu.ParamsDigest;
 
 import java.io.IOException;
 import java.util.List;
@@ -116,7 +117,7 @@ public class BittrexTradeServiceRaw extends BittrexBaseService {
 
   }
 
-  public List<BittrexUserTrade> getBittrexTradeHistory(CurrencyPair currencyPair) throws IOException {
+  public List<BittrexUserTrade> getBittrexTradeHistory(CurrencyPair currencyPair, String apiKey, ParamsDigest signatureCreator) throws IOException {
     String ccyPair = null;
     if(currencyPair != null)
       ccyPair = BittrexUtils.toPairString(currencyPair);

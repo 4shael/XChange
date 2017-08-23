@@ -2,6 +2,7 @@ package org.knowm.xchange.bittrex.v1.service;
 
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.bittrex.v1.BittrexAuthenticated;
+import org.knowm.xchange.dto.UserSettings;
 import org.knowm.xchange.service.BaseExchangeService;
 import org.knowm.xchange.service.BaseService;
 
@@ -26,6 +27,10 @@ public class BittrexBaseService extends BaseExchangeService implements BaseServi
     this.bittrexAuthenticated = RestProxyFactory.createProxy(BittrexAuthenticated.class, exchange.getExchangeSpecification().getSslUri());
     this.apiKey = exchange.getExchangeSpecification().getApiKey();
     this.signatureCreator = BittrexDigest.createInstance(exchange.getExchangeSpecification().getSecretKey());
+  }
+
+  protected ParamsDigest createSignatureCreator(UserSettings userSettings) {
+    return BittrexDigest.createInstance(exchange.getExchangeSpecification().getSecretKey());
   }
 
 }

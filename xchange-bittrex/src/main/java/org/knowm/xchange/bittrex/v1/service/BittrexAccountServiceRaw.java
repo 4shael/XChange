@@ -14,6 +14,7 @@ import org.knowm.xchange.bittrex.v1.dto.account.BittrexWithdrawResponse;
 import org.knowm.xchange.bittrex.v1.dto.account.BittrexWithdrawalHistory;
 import org.knowm.xchange.bittrex.v1.dto.account.BittrexWithdrawalsHistoryResponse;
 import org.knowm.xchange.exceptions.ExchangeException;
+import si.mazi.rescu.ParamsDigest;
 
 public class BittrexAccountServiceRaw extends BittrexBaseService {
 
@@ -27,7 +28,7 @@ public class BittrexAccountServiceRaw extends BittrexBaseService {
     super(exchange);
   }
 
-  public List<BittrexBalance> getBittrexAccountInfo() throws IOException {
+  public List<BittrexBalance> getBittrexAccountInfo(String apiKey, ParamsDigest signatureCreator) throws IOException {
 
     BittrexBalancesResponse response = bittrexAuthenticated.balances(apiKey, signatureCreator, exchange.getNonceFactory());
 

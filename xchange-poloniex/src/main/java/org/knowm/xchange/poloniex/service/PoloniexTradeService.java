@@ -13,6 +13,7 @@ import org.knowm.xchange.Exchange;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order;
 import org.knowm.xchange.dto.Order.OrderType;
+import org.knowm.xchange.dto.UserSettings;
 import org.knowm.xchange.dto.marketdata.Trades.TradeSortType;
 import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.dto.trade.MarketOrder;
@@ -39,6 +40,7 @@ import org.knowm.xchange.service.trade.params.orders.DefaultOpenOrdersParamCurre
 import org.knowm.xchange.service.trade.params.orders.OpenOrdersParamCurrencyPair;
 import org.knowm.xchange.service.trade.params.orders.OpenOrdersParams;
 import org.knowm.xchange.utils.DateUtils;
+import si.mazi.rescu.ParamsDigest;
 
 public class PoloniexTradeService extends PoloniexTradeServiceRaw implements TradeService {
 
@@ -114,9 +116,18 @@ public class PoloniexTradeService extends PoloniexTradeServiceRaw implements Tra
    * @param params Can optionally implement {@link TradeHistoryParamCurrencyPair} and {@link TradeHistoryParamsTimeSpan}. All other TradeHistoryParams
    * types will be ignored.
    */
+
+  @Override
+  public UserTrades getTradeHistory(TradeHistoryParams params, UserSettings userSettings) throws IOException {
+    return getTradeHistory(params, userSettings.getApiKey(), getSignatureCreator(userSettings));
+  }
+
   @Override
   public UserTrades getTradeHistory(TradeHistoryParams params) throws IOException {
+    return getTradeHistory(params, this.apiKey, this.signatureCreator);
+  }
 
+  private UserTrades getTradeHistory(TradeHistoryParams params, String apiKey, ParamsDigest signatureCreator) throws IOException {
     CurrencyPair currencyPair = null;
     Date startTime = null;
     Date endTime = null;
@@ -128,7 +139,8 @@ public class PoloniexTradeService extends PoloniexTradeServiceRaw implements Tra
       startTime = ((TradeHistoryParamsTimeSpan) params).getStartTime();
       endTime = ((TradeHistoryParamsTimeSpan) params).getEndTime();
     }
-    return getTradeHistory(currencyPair, DateUtils.toUnixTimeNullSafe(startTime), DateUtils.toUnixTimeNullSafe(endTime));
+    return getTradeHistory(currencyPair, DateUtils.toUnixTimeNullSafe(startTime), DateUtils.toUnixTimeNullSafe(endTime), apiKey, signatureCreator);
+
   }
 
   public BigDecimal getMakerFee() throws IOException {
@@ -141,11 +153,11 @@ public class PoloniexTradeService extends PoloniexTradeServiceRaw implements Tra
     return new BigDecimal(value);
   }
 
-  private UserTrades getTradeHistory(CurrencyPair currencyPair, final Long startTime, final Long endTime) throws IOException {
-
+  private UserTrades getTradeHistory(CurrencyPair currencyPair, final Long startTime, final Long endTime,
+                                     String apiKey, ParamsDigest signatureCreator) throws IOException {
     List<UserTrade> trades = new ArrayList<>();
     if (currencyPair == null) {
-      HashMap<String, PoloniexUserTrade[]> poloniexUserTrades = returnTradeHistory(startTime, endTime);
+      HashMap<String, PoloniexUserTrade[]> poloniexUserTrades = returnTradeHistory(startTime, endTime, apiKey, signatureCreator);
       if (poloniexUserTrades != null) {
         for (Map.Entry<String, PoloniexUserTrade[]> mapEntry : poloniexUserTrades.entrySet()) {
           currencyPair = PoloniexUtils.toCurrencyPair(mapEntry.getKey());
@@ -155,7 +167,7 @@ public class PoloniexTradeService extends PoloniexTradeServiceRaw implements Tra
         }
       }
     } else {
-      PoloniexUserTrade[] poloniexUserTrades = returnTradeHistory(currencyPair, startTime, endTime);
+      PoloniexUserTrade[] poloniexUserTrades = returnTradeHistory(currencyPair, startTime, endTime, apiKey, signatureCreator);
       if (poloniexUserTrades != null) {
         for (PoloniexUserTrade poloniexUserTrade : poloniexUserTrades) {
           trades.add(PoloniexAdapters.adaptPoloniexUserTrade(poloniexUserTrade, currencyPair));

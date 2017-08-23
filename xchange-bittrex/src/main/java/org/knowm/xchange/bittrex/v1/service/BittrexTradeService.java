@@ -5,6 +5,7 @@ import org.knowm.xchange.bittrex.v1.BittrexAdapters;
 import org.knowm.xchange.bittrex.v1.dto.trade.BittrexUserTrade;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order;
+import org.knowm.xchange.dto.UserSettings;
 import org.knowm.xchange.dto.marketdata.Trades.TradeSortType;
 import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.dto.trade.MarketOrder;
@@ -19,6 +20,7 @@ import org.knowm.xchange.service.trade.params.CancelOrderParams;
 import org.knowm.xchange.service.trade.params.TradeHistoryParamCurrencyPair;
 import org.knowm.xchange.service.trade.params.TradeHistoryParams;
 import org.knowm.xchange.service.trade.params.orders.OpenOrdersParams;
+import si.mazi.rescu.ParamsDigest;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -81,13 +83,22 @@ public class BittrexTradeService extends BittrexTradeServiceRaw implements Trade
 
   @Override
   public UserTrades getTradeHistory(TradeHistoryParams params) throws IOException {
+    return getTradeHistory(params, this.apiKey, this.signatureCreator);
+  }
+
+  @Override
+  public UserTrades getTradeHistory(TradeHistoryParams params, UserSettings userSettings) throws IOException {
+    return getTradeHistory(params, userSettings.getApiKey(), getSignatureCreator(userSettings));
+  }
+
+  private UserTrades getTradeHistory(TradeHistoryParams params, String apiKey, ParamsDigest signatureCreator) throws IOException {
     CurrencyPair currencyPair = null;
     if (params instanceof TradeHistoryParamCurrencyPair) {
       TradeHistoryParamCurrencyPair tradeHistoryParamCurrencyPair = (TradeHistoryParamCurrencyPair) params;
       currencyPair = tradeHistoryParamCurrencyPair.getCurrencyPair();
     }
 
-    List<BittrexUserTrade> bittrexTradeHistory = getBittrexTradeHistory(currencyPair);
+    List<BittrexUserTrade> bittrexTradeHistory = getBittrexTradeHistory(currencyPair, apiKey, signatureCreator);
     return new UserTrades(BittrexAdapters.adaptUserTrades(bittrexTradeHistory), TradeSortType.SortByTimestamp);
   }
 

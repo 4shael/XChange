@@ -39,6 +39,7 @@ import org.knowm.xchange.dto.trade.FloatingRateLoanOrder;
 import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.dto.trade.MarketOrder;
 import org.knowm.xchange.exceptions.ExchangeException;
+import si.mazi.rescu.ParamsDigest;
 
 public class BitfinexTradeServiceRaw extends BitfinexBaseService {
 
@@ -292,8 +293,7 @@ public class BitfinexTradeServiceRaw extends BitfinexBaseService {
     }
   }
 
-  public BitfinexTradeResponse[] getBitfinexTradeHistory(String symbol, long startTime, Long endTime, int limit) throws IOException {
-
+  public BitfinexTradeResponse[] getBitfinexTradeHistory(String apiKey, ParamsDigest signatureCreator, String symbol, long startTime, Long endTime, int limit) throws IOException {
     try {
       BitfinexTradeResponse[] trades = bitfinex.pastTrades(apiKey, payloadCreator, signatureCreator,
           new BitfinexPastTradesRequest(String.valueOf(exchange.getNonceFactory().createValue()), symbol, startTime, endTime, limit));

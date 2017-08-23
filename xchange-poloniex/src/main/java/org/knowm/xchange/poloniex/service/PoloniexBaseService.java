@@ -1,6 +1,7 @@
 package org.knowm.xchange.poloniex.service;
 
 import org.knowm.xchange.Exchange;
+import org.knowm.xchange.dto.UserSettings;
 import org.knowm.xchange.poloniex.Poloniex;
 import org.knowm.xchange.poloniex.PoloniexAuthenticated;
 import org.knowm.xchange.service.BaseExchangeService;
@@ -13,6 +14,10 @@ import si.mazi.rescu.ClientConfig;
 import si.mazi.rescu.ParamsDigest;
 import si.mazi.rescu.RestProxyFactory;
 import si.mazi.rescu.serialization.jackson.DefaultJacksonObjectMapperFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Zach Holmes
@@ -55,5 +60,11 @@ public class PoloniexBaseService extends BaseExchangeService implements BaseServ
     this.signatureCreator = PoloniexDigest.createInstance(exchange.getExchangeSpecification().getSecretKey());
     this.poloniex = RestProxyFactory.createProxy(Poloniex.class, exchange.getExchangeSpecification().getSslUri(), rescuConfig);
   }
+
+  @Override
+  protected ParamsDigest createSignatureCreator(UserSettings userSettings) {
+    return PoloniexDigest.createInstance(exchange.getExchangeSpecification().getSecretKey());
+  }
+
 
 }

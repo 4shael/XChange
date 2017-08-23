@@ -17,6 +17,7 @@ import org.knowm.xchange.bitfinex.v1.dto.account.BitfinexMarginInfosResponse;
 import org.knowm.xchange.bitfinex.v1.dto.account.BitfinexWithdrawalRequest;
 import org.knowm.xchange.bitfinex.v1.dto.account.BitfinexWithdrawalResponse;
 import org.knowm.xchange.exceptions.ExchangeException;
+import si.mazi.rescu.ParamsDigest;
 
 public class BitfinexAccountServiceRaw extends BitfinexBaseService {
 
@@ -30,8 +31,7 @@ public class BitfinexAccountServiceRaw extends BitfinexBaseService {
     super(exchange);
   }
 
-  public BitfinexBalancesResponse[] getBitfinexAccountInfo() throws IOException {
-
+  public BitfinexBalancesResponse[] getBitfinexAccountInfo(String apiKey, ParamsDigest signatureCreator) throws IOException {
     try {
       BitfinexBalancesResponse[] balances = bitfinex.balances(apiKey, payloadCreator, signatureCreator,
           new BitfinexBalancesRequest(String.valueOf(exchange.getNonceFactory().createValue())));

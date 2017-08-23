@@ -1,13 +1,17 @@
 package org.knowm.xchange.service;
 
 import java.math.BigDecimal;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.dto.Order;
+import org.knowm.xchange.dto.UserSettings;
 import org.knowm.xchange.dto.meta.CurrencyPairMetaData;
 import org.knowm.xchange.dto.meta.ExchangeMetaData;
 import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.dto.trade.MarketOrder;
+import si.mazi.rescu.ParamsDigest;
 
 /**
  * Top of the hierarchy abstract class for an "exchange service"
@@ -19,12 +23,15 @@ public abstract class BaseExchangeService {
    */
   protected final Exchange exchange;
 
+  protected final Map<UserSettings, ParamsDigest> signatureCreatorsCash;
+
+
   /**
    * Constructor
    */
   protected BaseExchangeService(Exchange exchange) {
-
     this.exchange = exchange;
+    this.signatureCreatorsCash = new ConcurrentHashMap<>();
   }
 
   public void verifyOrder(LimitOrder limitOrder) {
@@ -61,6 +68,20 @@ public abstract class BaseExchangeService {
       throw new IllegalArgumentException("Unsupported amount scale " + amount.scale());
     } else if (amount.compareTo(minimumAmount) < 0) {
       throw new IllegalArgumentException("Order amount less than minimum");
+    }
+  }
+
+  protected ParamsDigest createSignatureCreator(UserSettings userSettings) {
+    throw new NotImplementedException();
+  };
+
+  protected ParamsDigest getSignatureCreator(UserSettings userSettings) {
+    if (signatureCreatorsCash.containsKey(userSettings)) {
+      return signatureCreatorsCash.get(userSettings);
+    } else {
+      ParamsDigest signatureCreator = createSignatureCreator(userSettings);
+      signatureCreatorsCash.put(userSettings, signatureCreator);
+      return signatureCreator;
     }
   }
 

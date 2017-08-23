@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 import org.knowm.xchange.dto.Order;
+import org.knowm.xchange.dto.UserSettings;
 import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.dto.trade.MarketOrder;
 import org.knowm.xchange.dto.trade.OpenOrders;
@@ -16,6 +17,7 @@ import org.knowm.xchange.service.trade.params.CancelOrderParams;
 import org.knowm.xchange.service.trade.params.TradeHistoryParams;
 import org.knowm.xchange.service.trade.params.TradeHistoryParamsAll;
 import org.knowm.xchange.service.trade.params.orders.OpenOrdersParams;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * <p>
@@ -146,6 +148,10 @@ public interface TradeService extends BaseService {
    * @see TradeHistoryParamsAll
    */
   UserTrades getTradeHistory(TradeHistoryParams params) throws IOException;
+
+  default UserTrades getTradeHistory(TradeHistoryParams params, UserSettings userSettings) throws IOException {
+    throw new NotImplementedException();
+  }
 
   /**
    * Create {@link TradeHistoryParams} object specific to this exchange. Object created by this method may be used to discover supported and required

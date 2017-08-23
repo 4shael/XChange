@@ -10,6 +10,7 @@ import org.knowm.xchange.bitfinex.v1.BitfinexAdapters;
 import org.knowm.xchange.bitfinex.v1.BitfinexUtils;
 import org.knowm.xchange.bitfinex.v1.dto.account.BitfinexDepositAddressResponse;
 import org.knowm.xchange.currency.Currency;
+import org.knowm.xchange.dto.UserSettings;
 import org.knowm.xchange.dto.account.AccountInfo;
 import org.knowm.xchange.dto.account.FundingRecord;
 import org.knowm.xchange.exceptions.ExchangeException;
@@ -23,6 +24,7 @@ import org.knowm.xchange.service.trade.params.TradeHistoryParamLimit;
 import org.knowm.xchange.service.trade.params.TradeHistoryParams;
 import org.knowm.xchange.service.trade.params.TradeHistoryParamsTimeSpan;
 import org.knowm.xchange.service.trade.params.WithdrawFundsParams;
+import si.mazi.rescu.ParamsDigest;
 
 public class BitfinexAccountService extends BitfinexAccountServiceRaw implements AccountService {
 
@@ -32,14 +34,18 @@ public class BitfinexAccountService extends BitfinexAccountServiceRaw implements
    * @param exchange
    */
   public BitfinexAccountService(Exchange exchange) {
-
     super(exchange);
   }
 
   @Override
   public AccountInfo getAccountInfo() throws IOException {
+    return new AccountInfo(BitfinexAdapters.adaptWallet(getBitfinexAccountInfo(this.apiKey, this.signatureCreator)));
+  }
 
-    return new AccountInfo(BitfinexAdapters.adaptWallet(getBitfinexAccountInfo()));
+  @Override
+  public AccountInfo getAccountInfo(UserSettings userSettings) throws IOException {
+    ParamsDigest signatureCreator = getSignatureCreator(userSettings);
+    return new AccountInfo(BitfinexAdapters.adaptWallet(getBitfinexAccountInfo(userSettings.getApiKey(), signatureCreator)));
   }
 
   /**

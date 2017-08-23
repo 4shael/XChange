@@ -7,6 +7,7 @@ import java.util.List;
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.bittrex.v1.BittrexAdapters;
 import org.knowm.xchange.currency.Currency;
+import org.knowm.xchange.dto.UserSettings;
 import org.knowm.xchange.dto.account.AccountInfo;
 import org.knowm.xchange.dto.account.FundingRecord;
 import org.knowm.xchange.exceptions.ExchangeException;
@@ -31,8 +32,12 @@ public class BittrexAccountService extends BittrexAccountServiceRaw implements A
 
   @Override
   public AccountInfo getAccountInfo() throws IOException {
+    return new AccountInfo(BittrexAdapters.adaptWallet(getBittrexAccountInfo(this.apiKey, this.signatureCreator)));
+  }
 
-    return new AccountInfo(BittrexAdapters.adaptWallet(getBittrexAccountInfo()));
+  @Override
+  public AccountInfo getAccountInfo(UserSettings userSettings) throws ExchangeException, NotAvailableFromExchangeException, NotYetImplementedForExchangeException, IOException {
+    return new AccountInfo(BittrexAdapters.adaptWallet(getBittrexAccountInfo(userSettings.getApiKey(), createSignatureCreator(userSettings))));
   }
 
   @Override

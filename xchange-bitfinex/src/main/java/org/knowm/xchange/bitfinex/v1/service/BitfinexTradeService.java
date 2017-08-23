@@ -15,6 +15,7 @@ import org.knowm.xchange.bitfinex.v1.dto.trade.BitfinexOrderStatusResponse;
 import org.knowm.xchange.bitfinex.v1.dto.trade.BitfinexTradeResponse;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order;
+import org.knowm.xchange.dto.UserSettings;
 import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.dto.trade.MarketOrder;
 import org.knowm.xchange.dto.trade.OpenOrders;
@@ -33,6 +34,7 @@ import org.knowm.xchange.service.trade.params.TradeHistoryParams;
 import org.knowm.xchange.service.trade.params.TradeHistoryParamsTimeSpan;
 import org.knowm.xchange.service.trade.params.orders.OpenOrdersParams;
 import org.knowm.xchange.utils.DateUtils;
+import si.mazi.rescu.ParamsDigest;
 
 public class BitfinexTradeService extends BitfinexTradeServiceRaw implements TradeService {
 
@@ -115,7 +117,15 @@ public class BitfinexTradeService extends BitfinexTradeServiceRaw implements Tra
    */
   @Override
   public UserTrades getTradeHistory(TradeHistoryParams params) throws IOException {
+    return getTradeHistory(params, this.apiKey, this.signatureCreator);
+  }
 
+  @Override
+  public UserTrades getTradeHistory(TradeHistoryParams params, UserSettings userSettings) throws IOException {
+    return getTradeHistory(params, userSettings.getApiKey(), getSignatureCreator(userSettings));
+  }
+
+  public UserTrades getTradeHistory(TradeHistoryParams params, String apiKey, ParamsDigest signatureCreator) throws IOException {
     final String symbol;
     if (params instanceof TradeHistoryParamCurrencyPair && ((TradeHistoryParamCurrencyPair) params).getCurrencyPair() != null) {
       symbol = BitfinexAdapters.adaptCurrencyPair(((TradeHistoryParamCurrencyPair) params).getCurrencyPair());
@@ -148,7 +158,7 @@ public class BitfinexTradeService extends BitfinexTradeServiceRaw implements Tra
       limit = tradeHistoryParamLimit.getLimit();
     }
 
-    final BitfinexTradeResponse[] trades = getBitfinexTradeHistory(symbol, startTime, endTime, limit);
+    final BitfinexTradeResponse[] trades = getBitfinexTradeHistory(apiKey, signatureCreator, symbol, startTime, endTime, limit);
     return BitfinexAdapters.adaptTradeHistory(trades, symbol);
   }
 
